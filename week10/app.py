@@ -1,14 +1,9 @@
-from flask import Flask
+from fruits import create_app, db
 
-app = Flask(__name__)
+app = create_app()
 
-
-# Routes
-@app.route('/hello')
-def index():
-    return "Hello world"
-
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
+    # app.run(host='127.0.0.1', port=3000, debug=True)
