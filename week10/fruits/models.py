@@ -1,6 +1,7 @@
 from fruits import db
 from datetime import datetime
 import hashlib
+from flask_login import UserMixin
 
 
 class ExtraMixin(object):
@@ -72,7 +73,7 @@ class CBSNews(db.Model, ExtraMixin):
 
 
 
-class User(db.Model, ExtraMixin):
+class User(UserMixin, db.Model, ExtraMixin):
     __tablename__ = 'users'
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
@@ -98,3 +99,27 @@ class User(db.Model, ExtraMixin):
     def get_user_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
         # select * from users where username = username
+
+
+class Todo(db.Model, ExtraMixin):
+    __tablename__ = 'todos'
+    todo = db.Column(db.String(100), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    def delete_instance(self, using_transaction=True, keep_parents=False):
+        db.session.delete(self)
+        db.session.commit()
+
+    @classmethod
+    def get_all_todos(cls):
+        return cls.query.all()
+
+    @classmethod
+    def get_todos_by_user_id(cls, user_id):
+        return cls.query.filter_by(created_by=user_id).all()
+
+    @classmethod
+    def get_by_id(cls, todo_id):
+        return cls.query.filter_by(id=todo_id).first()
+
+
